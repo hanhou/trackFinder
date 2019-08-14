@@ -106,6 +106,31 @@ site = getSiteLocations(fn, params);
 save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site');
 writeBigWarp(fn.BrainToAllenWithTrack, site);
 
+lcnt=writeRevCsv(fn.BrainToAllenWithTrack);
+fn.BrainToAllenWithTrack = [fn.BrainToAllenWithTrack(1:end-4) '_Rev.csv'];
+%Do all of the hard work
+site = getSiteLocations(fn, params);
+
+%Save stuff to .mat and .csv files (BigWarp format)
+save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site');
+writeBigWarp(fn.BrainToAllenWithTrack, site);
+
+site=load([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat']); % get the whole track
+listOfAreas=site.site.ont.name;
+emptyAreas=cellfun('isempty',listOfAreas);
+listOfAreas=listOfAreas(~emptyAreas);
+tip=length(listOfAreas);
+M = dlmread([fn.BrainToAllenWithTrack(1:end-4) '_OriginalToAllenSites.csv'],',',[tip-1 5 tip-1 7]);
+fn.BrainToAllenWithTrack = [fn.BrainToAllenWithTrack(1:end-8) '.csv'];
+replaceLineCsv(fn.BrainToAllenWithTrack,lcnt,M)
+fn.BrainToAllenWithTrack = [fn.BrainToAllenWithTrack(1:end-4) '_Whole.csv'];
+%Do all of the hard work
+site = getSiteLocations(fn, params);
+
+%Save stuff to .mat and .csv files (BigWarp format)
+save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site');
+writeBigWarp(fn.BrainToAllenWithTrack, site);
+
 
 function writeBigWarp(fn, site)
 use = site.in.brain;
@@ -132,34 +157,68 @@ end
 fclose(fid);
 
 
-function writeRevCsv(AllenToToronto)
+function lcnt=writeRevCsv(AllenToToronto)
 col = 3:8;
 
 fid = fopen(AllenToToronto);
 cnt = 0;
-while(~feof(fid))
-    fgetl(fid);
-    cnt = cnt+1;
-end
-fclose(fid);
-
-pts = zeros(cnt, numel(col));
-
-fid = fopen(AllenToToronto);
-cnt = 0;
+lcnt = 0;
 while(~feof(fid))
     str = fgetl(fid);
     cnt = cnt+1;
     str = str(str~='"');
     elements = strsplit(str, ',');
-    pts(cnt, :) = cellfun(@str2num, elements(col));
+    if strcmp(elements(3),'Infinity')
+        lcnt = cnt;
+        break
+    end
 end
 fclose(fid);
 
-fid = fopen([AllenToToronto(1:end-4) '_OriginalToAllenSites.csv'], 'w+');
+M = dlmread(AllenToToronto,',',[lcnt-1 5 lcnt length(elements)-1]);
+
+pts = zeros(lcnt-1, numel(col));
+
+fid = fopen(AllenToToronto);
+for i=1:lcnt-1
+    str = fgetl(fid);
+    str = str(str~='"');
+    elements = strsplit(str, ',');
+    pts(i, :) = cellfun(@str2num, elements(col));
+end
+fclose(fid);
+
+fid = fopen([AllenToToronto(1:end-4) '_Rev.csv'], 'w+');
 for i = 1:size(pts, 1)
     dat = pts(i, :);
-    fprintf(fid, '%s,true,%f,%f,%f,%f,%f,%f\n', ['Pt-' num2str(i)], dat);
+    fprintf(fid, '%s,true,%.9f,%.9f,%.9f,%5.6f,%5.6f,%5.6f\n', ['Pt-' num2str(i-1)], dat);
 end
+fprintf(fid, '%s,true,Infinity,Infinity,Infinity,%5.6f,%5.6f,%5.6f\n', ['Pt-' num2str(lcnt-1)], M(2,:));
+fprintf(fid, '%s,true,Infinity,Infinity,Infinity,%5.6f,%5.6f,%5.6f\n', ['Pt-' num2str(lcnt)], M(1,:));
 fclose(fid);
 
+
+function replaceLineCsv(AllenToToronto,lcnt,replacement)
+% Read txt into cell A
+fid = fopen(AllenToToronto,'r');
+i = 1;
+tline = fgetl(fid);
+A{i} = tline;
+while ischar(tline)
+    i = i+1;
+    tline = fgetl(fid);
+    A{i} = tline;
+end
+fclose(fid);
+% Change cell A
+A{lcnt} = sprintf('%s,true,Infinity,Infinity,Infinity,%5.6f,%5.6f,%5.6f', ['Pt-' num2str(lcnt-1)], replacement);
+% Write cell A into txt
+fid = fopen([AllenToToronto(1:end-4) '_Whole.csv'], 'w');
+for i = 1:numel(A)
+    if A{i+1} == -1
+        fprintf(fid,'%s', A{i});
+        break
+    else
+        fprintf(fid,'%s\n', A{i});
+    end
+end

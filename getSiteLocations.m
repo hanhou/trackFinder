@@ -231,7 +231,7 @@ ont.id = id;
 % 3D Thin Plate Spline by Yang Yang (05.05.2012)
 % 
 %======================================================
-function [wobject] = TPS3D(points, ctrlpoints,object)
+function [wobject] = TPS3D(points,ctrlpoints,object)
 %======================================================
 % Calculate Parameters 
 %======================================================
