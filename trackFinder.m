@@ -8,8 +8,8 @@ function trackFinder(filename)
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksRightTrack3.csv'; % 5.22
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksRightTrack5.csv'; % 5.05
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack1.csv'; % 5.17
-
 % fn.BrainToAllenWithTrack = filename;
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack1.csv'; % 5
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack3.csv'; % 5
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack5.csv'; % 5.1
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\dl40landmarksRightTrack1alm.csv'; % 2
@@ -35,6 +35,7 @@ function trackFinder(filename)
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl59\landmarks_rightTrack2.csv'; % 4.2
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl59\landmarks_rightTrack3.csv'; % 3.95
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl59\landmarks_rightTrack4.csv'; % 4.2
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl59\landmarks_leftTrack1ALM.csv'; % 1.68
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl59\landmarks_leftTrack2ALM.csv'; % 1.77
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl59\landmarks_leftTrack3ALM.csv'; % 1.89
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl59\landmarks_leftTrack4ALM.csv'; % 1.89
@@ -55,6 +56,7 @@ function trackFinder(filename)
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl57\landmarks_Track3.csv'; % 4.6
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl57\landmarks_Track4.csv'; % 4.8
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl57\landmarks_Track5.csv'; % 4.43
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl57\landmarksRight.csv'; % 5.0009
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl57\landmarks_Track1ALM.csv'; % 1.89
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl57\landmarks_Track2ALM.csv'; % 1.93
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl57\landmarks_Track3ALM.csv'; % 1.9
@@ -65,9 +67,24 @@ function trackFinder(filename)
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl56\landmarks_right3.csv'; % 4.42
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl56\landmarks_right4.csv'; % 4.44
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl56\landmarks_rightALM.csv'; % 1.67
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl56\landmarksLeft.csv'; % 4.67
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl56\landmarks_left1ALM.csv'; % 1.55
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl56\landmarks_left2ALM.csv'; % 1.67
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl56\landmarks_left3ALM.csv'; % 1.67
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_right1.csv'; % 3.9
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_right2.csv'; % 4.1
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_right3.csv'; % 4.1
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_right4.csv'; % 4.1
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_left1.csv'; % 4.09
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_left2.csv'; % 4.11
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_left3.csv'; % 4.2
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_leftALM1.csv'; % 1.92
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_leftALM2.csv'; % 1.94
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_leftALM3.csv'; % 1.94
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_leftALM4.csv'; % 1.98
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_rightALM1.csv'; % 2.05
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_rightALM2.csv'; % 2
+% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl62\landmarks_rightALM3.csv'; % 2
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\sc17\landmarks_lALM_1.csv'; % 1.67
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\sc17\landmarks_lALM_2.csv'; % 1.67
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\sc17\landmarks_lALM_4.csv'; % 1.67
@@ -83,18 +100,40 @@ function trackFinder(filename)
 % fn.BrainToAllenWithTrack = 'F:\3rd\dl78_20190611.csv';
 % fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_test.csv';
 % fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_20190613.csv';
-fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_20190616.csv';
-% fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_20190616_rev.csv';
+% fn.BrainToAllenWithTrack = 'I:\test_5\landmarks_20190616.csv';
+% fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_20190612.csv';
+% fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_20190617.csv';
+% fn.BrainToAllenWithTrack = 'I:\dl79\landmarks_20190716.csv';
+% fn.BrainToAllenWithTrack = 'F:\dl79\landmarks_20190715.csv';
+% fn.BrainToAllenWithTrack = 'F:\dl79\landmarks_20190719.csv';
+% fn.BrainToAllenWithTrack = 'F:\dl79\landmarks_20190719_2.csv';
+% fn.BrainToAllenWithTrack = 'F:\dl79\landmarks_20190717.csv';
+% fn.BrainToAllenWithTrack = 'F:\dl79\landmarks_20190717_3.csv';
+% fn.BrainToAllenWithTrack = 'F:\dl79\landmarks_20190718_2.csv';
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191115_1.csv'; % 3.8472
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191115_2.csv'; % 3.8469
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191116_1.csv'; % 3.8802
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191116_2.csv'; % 3.7923
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191116_3.csv'; % 3.8228
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191116_4.csv'; % 3.8368
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191117_1.csv'; % 3.8802
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191117_2.csv'; % 3.7923
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191117_3.csv'; % 3.8228
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191117_4.csv'; % 4.8668
+fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191117_5.csv'; % 4.7624
 
-%These files need to be in the same directory as the code
+% These files need to be in the same directory as the code
 fn.AllenToToronto = 'landmarksAllenToToronto.csv';
-fn.AnnotatedBrain = 'C:\Users\liul.HHMI\Desktop\trackFinderData\Annotation_new_10_ds222_16bit.tif';
-fn.Ontology = 'mousebrainontology_name.csv';
+% fn.AnnotatedBrain = 'C:\Users\liul.HHMI\Desktop\trackFinderData\Annotation_new_10_ds222_16bit.tif'; % 2015 v1
+fn.AnnotatedBrain = 'C:\Users\liul.HHMI\Desktop\trackFinderData\Annotation_new_10_ds222_32bit.tif'; % 2017 v3
+% fn.Ontology = 'mousebrainontology_name.csv'; % 2015
+fn.Ontology = 'mousebrainontology_2.csv'; % 2017 v3
 
 %all in mm
 params.ManipulatorDepth = 1.93;
-params.TipOffset = 0;
-params.Pitch = 0.01;
+params.TipOffset = 0.3;
+params.Pitch = 0.01; % site dist
+params.ScalingFactor = 0.98;
 params.AllenPixelSize = 0.02;
 params.Nsites = 1000;
 params.showVis = 1;
@@ -106,31 +145,16 @@ site = getSiteLocations(fn, params);
 save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site');
 writeBigWarp(fn.BrainToAllenWithTrack, site);
 
-lcnt=writeRevCsv(fn.BrainToAllenWithTrack);
-fn.BrainToAllenWithTrack = [fn.BrainToAllenWithTrack(1:end-4) '_Rev.csv'];
-%Do all of the hard work
-site = getSiteLocations(fn, params);
-
-%Save stuff to .mat and .csv files (BigWarp format)
-save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site');
-writeBigWarp(fn.BrainToAllenWithTrack, site);
-
-site=load([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat']); % get the whole track
-listOfAreas=site.site.ont.name;
-emptyAreas=cellfun('isempty',listOfAreas);
-listOfAreas=listOfAreas(~emptyAreas);
-tip=length(listOfAreas);
-M = dlmread([fn.BrainToAllenWithTrack(1:end-4) '_OriginalToAllenSites.csv'],',',[tip-1 5 tip-1 7]);
-fn.BrainToAllenWithTrack = [fn.BrainToAllenWithTrack(1:end-8) '.csv'];
-replaceLineCsv(fn.BrainToAllenWithTrack,lcnt,M)
-fn.BrainToAllenWithTrack = [fn.BrainToAllenWithTrack(1:end-4) '_Whole.csv'];
-%Do all of the hard work
-site = getSiteLocations(fn, params);
-
-%Save stuff to .mat and .csv files (BigWarp format)
-save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site');
-writeBigWarp(fn.BrainToAllenWithTrack, site);
-
+% load([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site'); % CCF distance
+% listOfAreas=site.ont.name;
+% emptyAreas=cellfun('isempty',listOfAreas);
+% listOfAreas=flipud(listOfAreas(~emptyAreas));
+% distanceS=zeros(length(listOfAreas)-1,1);
+% for i=1:length(listOfAreas)-1
+%     distanceS(i)=sqrt((site.pos.x(i)-site.pos.x(i+1)).^2+(site.pos.y(i)-site.pos.y(i+1)).^2+(site.pos.z(i)-site.pos.z(i+1)).^2);
+% end
+% (length(listOfAreas)-20)/100
+% sum(distanceS)*0.02-0.2
 
 function writeBigWarp(fn, site)
 use = site.in.brain;
@@ -144,9 +168,7 @@ fixed = [site.pos.x(use) site.pos.y(use) site.pos.z(use)].*site.pos.mmPerPixel.*
 
 writeBigWarpLandmarks([fn(1:end-4) '_OriginalToAllenSites.csv'], moving, fixed);
 
-
 function writeBigWarpLandmarks(outfn, moving, fixed)
-
 fid = fopen(outfn, 'w+');
 pos = [moving fixed];
 
@@ -155,70 +177,3 @@ for i = 1:size(pos, 1)
     fprintf(fid, '%s,true,%f,%f,%f,%f,%f,%f\n', ['Pt-' num2str(i)], dat);
 end
 fclose(fid);
-
-
-function lcnt=writeRevCsv(AllenToToronto)
-col = 3:8;
-
-fid = fopen(AllenToToronto);
-cnt = 0;
-lcnt = 0;
-while(~feof(fid))
-    str = fgetl(fid);
-    cnt = cnt+1;
-    str = str(str~='"');
-    elements = strsplit(str, ',');
-    if strcmp(elements(3),'Infinity')
-        lcnt = cnt;
-        break
-    end
-end
-fclose(fid);
-
-M = dlmread(AllenToToronto,',',[lcnt-1 5 lcnt length(elements)-1]);
-
-pts = zeros(lcnt-1, numel(col));
-
-fid = fopen(AllenToToronto);
-for i=1:lcnt-1
-    str = fgetl(fid);
-    str = str(str~='"');
-    elements = strsplit(str, ',');
-    pts(i, :) = cellfun(@str2num, elements(col));
-end
-fclose(fid);
-
-fid = fopen([AllenToToronto(1:end-4) '_Rev.csv'], 'w+');
-for i = 1:size(pts, 1)
-    dat = pts(i, :);
-    fprintf(fid, '%s,true,%.9f,%.9f,%.9f,%5.6f,%5.6f,%5.6f\n', ['Pt-' num2str(i-1)], dat);
-end
-fprintf(fid, '%s,true,Infinity,Infinity,Infinity,%5.6f,%5.6f,%5.6f\n', ['Pt-' num2str(lcnt-1)], M(2,:));
-fprintf(fid, '%s,true,Infinity,Infinity,Infinity,%5.6f,%5.6f,%5.6f\n', ['Pt-' num2str(lcnt)], M(1,:));
-fclose(fid);
-
-
-function replaceLineCsv(AllenToToronto,lcnt,replacement)
-% Read txt into cell A
-fid = fopen(AllenToToronto,'r');
-i = 1;
-tline = fgetl(fid);
-A{i} = tline;
-while ischar(tline)
-    i = i+1;
-    tline = fgetl(fid);
-    A{i} = tline;
-end
-fclose(fid);
-% Change cell A
-A{lcnt} = sprintf('%s,true,Infinity,Infinity,Infinity,%5.6f,%5.6f,%5.6f', ['Pt-' num2str(lcnt-1)], replacement);
-% Write cell A into txt
-fid = fopen([AllenToToronto(1:end-4) '_Whole.csv'], 'w');
-for i = 1:numel(A)
-    if A{i+1} == -1
-        fprintf(fid,'%s', A{i});
-        break
-    else
-        fprintf(fid,'%s\n', A{i});
-    end
-end

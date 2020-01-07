@@ -43,13 +43,14 @@ xv = 1:ds:size(Anno, 2);
 yv = 1:ds:size(Anno, 3);
 zv = 1:ds:size(Anno, 1);
 
-figure; subplot(111); hold on; axis image;
+% figure; 
+subplot(111); hold on; axis image;
 
 p = patch(isosurface(xv.*sc, yv.*sc, zv.*sc, an ,1));
 p.FaceAlpha = 0.05;
-p.FaceColor = [1 1 1];
+p.FaceColor = [0 0 0];
 p.LineStyle = 'none';
-set(gca, 'Color', [0 0 0], 'ZDir', 'Reverse');
+set(gca, 'Color', [1 1 1], 'ZDir', 'Reverse');
 
 listOfAreas=site.ont.name;
 emptyAreas=cellfun('isempty',listOfAreas);
@@ -110,21 +111,22 @@ info.inSpace = inSpace;
 
 function [siteLoc, warpedProbeLoc, warpedProbeDepth] = warpAndSetSites(warpPts, params, trackPts)
 
-warpedTrack = TPS3D(warpPts(:, 1:3), warpPts(:, 4:6), trackPts);
-CtrlDist = sqrt(sum((warpedTrack-repmat(warpedTrack(1,:), size(warpedTrack, 1), 1)).^2, 2));
+warpedTrack = TPS3D(warpPts(:, 1:3), warpPts(:, 4:6), trackPts); % Allen to MRI
+CtrlDist = (sqrt(sum((warpedTrack-repmat(warpedTrack(1,:), size(warpedTrack, 1), 1)).^2, 2)))*params.ScalingFactor; % dist from the first point
 
 warpedProbeLoc = zeros(params.Nsites, 3);
 warpedProbeDepth = zeros(params.Nsites, 1);
 
 for i = 1:params.Nsites
-    dist = params.TipOffset+(i-1)*params.Pitch;
+    dist = params.TipOffset+(i-1)*params.Pitch; % distance to move from tip
     warpedProbeDepth(i) = dist;
     
-    ix1 = find(dist>=CtrlDist, 1, 'last');
-    ix2 = find(dist<CtrlDist, 1, 'first');
+    ix1 = find(dist>=CtrlDist, 1, 'last'); % lower point
+    ix2 = find(dist<CtrlDist, 1, 'first'); % upper point
     
-    if isempty(ix1)
-        ix1 = -inf;
+    if isempty(ix1) % if want to extrapolate the tip
+        ix1 = 1;
+        ix2 = 2;
     elseif isempty(ix2)
         ix2 = ix1;
         ix1 = ix1-1;
@@ -139,7 +141,6 @@ function pts = readBigWarpLandmarks(AllenToToronto)
 col = 3:8;
 
 fid = fopen(AllenToToronto);
-% fgetl(fid);
 cnt = 0;
 while(~feof(fid))
     fgetl(fid);
@@ -150,7 +151,6 @@ fclose(fid);
 pts = zeros(cnt, numel(col));
 
 fid = fopen(AllenToToronto);
-% fgetl(fid);
 cnt = 0;
 while(~feof(fid))
     str = fgetl(fid);
@@ -174,7 +174,7 @@ if bitdepth == 32
     im=zeros(ypix,xpix,frames,'uint32');
 elseif bitdepth ==16
     im=zeros(ypix,xpix,frames,'uint16');
-elseif bitdepth ==8;
+elseif bitdepth ==8
     im=zeros(ypix,xpix,frames,'uint8');
 end
 warning off;
@@ -241,11 +241,10 @@ for rr = 1:npnts
     for cc = 1:npnts
         K(rr,cc) = sum( (points(rr,:) - points(cc,:)).^2 ); %R^2 
         K(cc,rr) = K(rr,cc);
-    end;
-end;
+    end
+end
 %calculate kernel function R
-K = max(K,1e-320); 
-%K = K.* log(sqrt(K));
+K = max(K,1e-320);
 K = sqrt(K); %
 % Calculate P matrix
 P = [ones(npnts,1), points]; %nX4 for 3D
@@ -262,7 +261,7 @@ gy=object(:,2);
 gz=object(:,3);
 for nn = 1:npnts
     K(:,nn) = (gx - points(nn,1)).^2 + (gy - points(nn,2) ).^2 + (gz - points(nn,3) ).^2; % R^2
-end;
+end
 K = max(K,1e-320); 
 K = sqrt(K); %|R| for 3D
 P = [ones(pntsNum,1), gx, gy, gz];
