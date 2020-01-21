@@ -54,7 +54,7 @@ set(gca, 'Color', [1 1 1], 'ZDir', 'Reverse');
 
 listOfAreas=site.ont.name;
 emptyAreas=cellfun('isempty',listOfAreas);
-listOfAreas=flipud(listOfAreas(~emptyAreas));
+listOfAreas=listOfAreas(~emptyAreas);
 
 plot3(site.pos.x(1:length(listOfAreas)).*sc, site.pos.z(1:length(listOfAreas)).*sc, site.pos.y(1:length(listOfAreas)).*sc, 'r.');
 
@@ -81,7 +81,12 @@ site.ont.id = info.ids;
 site.ont.name = info.names;
 
 site.in.space = info.inSpace;
-site.in.brain = warpDepth<params.ManipulatorDepth;
+site.in.brain = zeros(length(info.inSpace),1);
+listOfAreas=info.names;
+emptyAreas=cellfun('isempty',listOfAreas);
+listOfAreas=listOfAreas(~emptyAreas);
+site.in.brain(1:length(listOfAreas)) = 1;
+site.in.brain=logical(site.in.brain);
 
 site.params = params;
 
@@ -188,43 +193,6 @@ TifLink.close();
 
 warning on;
 disp('Done loading Tif');
-
-
-function ont = importOntology(fn)
-
-fid = fopen(fn);
-cnt = 0;
-while ~feof(fid)
-    str = fgetl(fid);
-    cnt = cnt + 1;
-end
-fclose(fid);
-
-id = zeros(cnt, 1);
-info = cell(cnt, 1);
-
-fid = fopen(fn);
-cnt = 0;
-while ~feof(fid)
-    str = fgetl(fid);
-    cnt = cnt + 1;
-    
-    inds = strfind(str, ',');
-    
-    if ~isempty(inds)
-    
-    id(cnt) = str2double(str(1:inds(1)-1));
-    temp = str(inds(1)+1:end);
-    
-    temp = temp(temp~='"');
-    info{cnt} = temp;
-    end
-
-end
-fclose(fid);
-
-ont.name = info;
-ont.id = id;
 
 
 %======================================================

@@ -10,7 +10,7 @@ function trackFinder(filename)
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack1.csv'; % 5.17
 % fn.BrainToAllenWithTrack = filename;
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack1.csv'; % 5
-% fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack3.csv'; % 5
+fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack3.csv'; % 5
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack5.csv'; % 5.1
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\dl40landmarksRightTrack1alm.csv'; % 2
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksRightTrack3alm.csv'; % 1.97
@@ -120,7 +120,7 @@ function trackFinder(filename)
 % fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191117_2.csv'; % 3.7923
 % fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191117_3.csv'; % 3.8228
 % fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191117_4.csv'; % 4.8668
-fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191117_5.csv'; % 4.7624
+% fn.BrainToAllenWithTrack = 'H:\a3d\dl81\landmarks_20191117_5.csv'; % 4.7624
 
 % These files need to be in the same directory as the code
 fn.AllenToToronto = 'landmarksAllenToToronto.csv';
@@ -131,9 +131,9 @@ fn.Ontology = 'mousebrainontology_2.csv'; % 2017 v3
 
 %all in mm
 params.ManipulatorDepth = 1.93;
-params.TipOffset = 0.3;
+params.TipOffset = -0.3;
 params.Pitch = 0.01; % site dist
-params.ScalingFactor = 0.98;
+params.ScalingFactor = 0.94;
 params.AllenPixelSize = 0.02;
 params.Nsites = 1000;
 params.showVis = 1;
@@ -141,9 +141,10 @@ params.showVis = 1;
 %Do all of the hard work
 site = getSiteLocations(fn, params);
 
-%Save stuff to .mat and .csv files (BigWarp format)
+%Save site information to .mat and .csv files (BigWarp format)
 save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site');
 writeBigWarp(fn.BrainToAllenWithTrack, site);
+plotAnnotation([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat']);
 
 % load([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site'); % CCF distance
 % listOfAreas=site.ont.name;
