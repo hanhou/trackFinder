@@ -36,6 +36,7 @@ orig = TPS3D(warpPts(:, 4:6), warpPts(:, 1:3), pos);
 function renderIn3D(Anno, site)
 sc = site.pos.mmPerPixel;
 ds = 4;
+% ds = 1;
 an = Anno(1:ds:end, 1:ds:end, 1:ds:end);
 an = permute(an,[3 2 1]);
 
@@ -44,21 +45,23 @@ yv = 1:ds:size(Anno, 3);
 zv = 1:ds:size(Anno, 1);
 
 % figure; 
-subplot(111); hold on; axis image;
-
-p = patch(isosurface(xv.*sc, yv.*sc, zv.*sc, an ,1));
-p.FaceAlpha = 0.05;
-p.FaceColor = [0 0 0];
-p.LineStyle = 'none';
-set(gca, 'Color', [1 1 1], 'ZDir', 'Reverse');
+subplot(111); axis image;
 
 listOfAreas=site.ont.name;
 emptyAreas=cellfun('isempty',listOfAreas);
 listOfAreas=listOfAreas(~emptyAreas);
 
-plot3(site.pos.x(1:length(listOfAreas)).*sc, site.pos.z(1:length(listOfAreas)).*sc, site.pos.y(1:length(listOfAreas)).*sc, 'r.');
+p = patch(isosurface(xv.*sc, yv.*sc, zv.*sc, an ,1));
+p.FaceAlpha = 0.05;
+p.FaceColor = [0 0 0];
+p.LineStyle = 'none';
 
-view(51, 14);
+hold on;
+
+% plot3(site.pos.x(1:length(listOfAreas)).*sc, site.pos.z(1:length(listOfAreas)).*sc, site.pos.y(1:length(listOfAreas)).*sc,'r','lineWidth',1);
+plot3([site.pos.x(1) site.pos.x(length(listOfAreas))].*sc, [site.pos.z(1) site.pos.z(length(listOfAreas))].*sc, [site.pos.y(1) site.pos.y(length(listOfAreas))].*sc,'r','lineWidth',1);
+set(gca, 'Color', [1 1 1], 'ZDir', 'Reverse');
+view(51, 14); xlim([0 11.4]); ylim([0 13.2]); zlim([0 8]);
 
 
 function site = collectResults(annoPts, warpPos, origPos, info, params, warpDepth)
