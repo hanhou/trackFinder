@@ -1,14 +1,12 @@
 function trackFinder(filename)
-% clear; clc; close all;
-
 %Full path to BigWarp output file
+fn.BrainToAllenWithTrack = filename;
 % fn.BrainToAllenWithTrack = 'X:\users\Mike\Projects\MAP\Susu-test\sctest_withTrack.csv';
 % fn.BrainToAllenWithTrack = 'X:\users\Mike\Projects\MAP\tw35_reg\tw34RegToAllen_withSampleTracks.csv';
 % fn.BrainToAllenWithTrack = 'F:\dl51\dl40\dl40landmarksRightTrack1.csv'; % 5.07
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksRightTrack3.csv'; % 5.22
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksRightTrack5.csv'; % 5.05
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack1.csv'; % 5.17
-fn.BrainToAllenWithTrack = filename;
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack1.csv'; % 5
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack3.csv'; % 5
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl40\newMRI\dl40landmarksLeftTrack5.csv'; % 5.1
@@ -71,7 +69,6 @@ fn.BrainToAllenWithTrack = filename;
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl56\landmarks_left1ALM.csv'; % 1.55
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl56\landmarks_left2ALM.csv'; % 1.67
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\dl56\landmarks_left3ALM.csv'; % 1.67
-
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\sc17\landmarks_lALM_1.csv'; % 1.67
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\sc17\landmarks_lALM_2.csv'; % 1.67
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\sc17\landmarks_lALM_4.csv'; % 1.67
@@ -86,7 +83,7 @@ fn.BrainToAllenWithTrack = filename;
 % fn.BrainToAllenWithTrack = 'T:\MAP\imaging\sc17\landmarks_lstr_3.csv'; % 1.67
 % fn.BrainToAllenWithTrack = 'F:\3rd\dl78_20190611.csv';
 % fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_test.csv';
-% fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_20190613.csv';
+% fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_20190613.csv'; % 4.620
 % fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_20190616.csv';
 % fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_20190612.csv';
 % fn.BrainToAllenWithTrack = 'F:\test_5\landmarks_20190617.csv';
@@ -111,26 +108,19 @@ fn.BrainToAllenWithTrack = filename;
 
 % These files need to be in the same directory as the code
 fn.AllenToToronto = 'landmarksAllenToToronto.csv';
-% fn.AnnotatedBrain = 'C:\Users\liul.HHMI\Desktop\trackFinderData\Annotation_new_10_ds222_16bit.tif'; % 2015 v1
 fn.AnnotatedBrain = 'C:\Users\liul.HHMI\Desktop\trackFinderData\Annotation_new_10_ds222_32bit.tif'; % 2017 v3
-% fn.Ontology = 'mousebrainontology_name.csv'; % 2015
 fn.Ontology = 'mousebrainontology_2.csv'; % 2017 v3
 
 %all in mm
-params.ManipulatorDepth = 1.93;
 params.TipOffset = 0.2;
-params.Pitch = 0.01; % site dist
+params.SiteDist = 0.01; % site dist
 params.ScalingFactor = 1;
 params.AllenPixelSize = 0.02;
 params.Nsites = 1000;
 params.showVis = 1;
 
-%Do all of the hard work
-site = getSiteLocations(fn, params);
-
-% Save site information to .mat and .csv files (BigWarp format)
-% save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site');
-% writeBigWarp(fn.BrainToAllenWithTrack, site);
+site = getSiteLocations(fn, params); % Do all of the hard work
+% save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site'); % Save site information to a .mat file
 % plotAnnotation([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat']);
 
 % load([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site'); % CCF distance
@@ -143,25 +133,3 @@ site = getSiteLocations(fn, params);
 % end
 % (length(listOfAreas)-20)/100
 % sum(distanceS)*0.02-0.2
-
-function writeBigWarp(fn, site)
-use = site.in.brain;
-moving = [site.pos.x(use) site.pos.y(use) site.pos.z(use)].*site.pos.mmPerPixel.*1000;
-fixed = [site.warp.x(use) site.warp.y(use) site.warp.z(use)];
-
-writeBigWarpLandmarks([fn(1:end-4) '_AllenToTorontoSites.csv'], moving, fixed);
-
-moving = [site.orig.x(use) site.orig.y(use) site.orig.z(use)];
-fixed = [site.pos.x(use) site.pos.y(use) site.pos.z(use)].*site.pos.mmPerPixel.*1000;
-
-writeBigWarpLandmarks([fn(1:end-4) '_OriginalToAllenSites.csv'], moving, fixed);
-
-function writeBigWarpLandmarks(outfn, moving, fixed)
-fid = fopen(outfn, 'w+');
-pos = [moving fixed];
-
-for i = 1:size(pos, 1)
-    dat = pos(i, :);
-    fprintf(fid, '%s,true,%f,%f,%f,%f,%f,%f\n', ['Pt-' num2str(i)], dat);
-end
-fclose(fid);

@@ -11,16 +11,20 @@ trackix = any(isinf(warp.BrainToA), 2);
 trackPts = warp.BrainToA(trackix, 4:6);
 
 %Put down points in warped space
-[sitePos, warpPos, warpDepth] = warpAndSetSites(warp.AtoT, params, trackPts);
+[sitePos, warpPos] = warpAndSetSites(warp.AtoT, params, trackPts);
 
 annoPos = round(sitePos./params.AllenPixelSize./1000);
 info = getSiteAnnotations(annoPos, Anno, Ont);
 
-info.inBrain = warpDepth<params.ManipulatorDepth;
-
 origPos = warpToBrainSpace(warp.BrainToA, sitePos);
 
-site = collectResults(annoPos, warpPos, origPos, info, params, warpDepth);
+site = collectResults(annoPos, warpPos, origPos, info, params);
+
+listOfAreas=site.ont.name; emptyAreas=cellfun('isempty',listOfAreas);
+listOfAreas=listOfAreas(~emptyAreas);
+
+info.inBrain = zeros(size(sitePos,1),1);
+info.inBrain(1:length(listOfAreas))=1;
 
 if params.showVis
     renderIn3D(Anno, site);
@@ -36,7 +40,6 @@ orig = TPS3D(warpPts(:, 4:6), warpPts(:, 1:3), pos);
 function renderIn3D(Anno, site)
 sc = site.pos.mmPerPixel;
 ds = 4;
-% ds = 1;
 an = Anno(1:ds:end, 1:ds:end, 1:ds:end);
 an = permute(an,[3 2 1]);
 
@@ -51,20 +54,18 @@ listOfAreas=site.ont.name;
 emptyAreas=cellfun('isempty',listOfAreas);
 listOfAreas=listOfAreas(~emptyAreas);
 
-p = patch(isosurface(xv.*sc, yv.*sc, zv.*sc, an ,1));
-p.FaceAlpha = 0.05;
-p.FaceColor = [0 0 0];
-p.LineStyle = 'none';
+% p = patch(isosurface(xv.*sc, yv.*sc, zv.*sc, an ,1));
+% p.FaceAlpha = 0.05; p.FaceColor = [0 0 0]; p.LineStyle = 'none';
 
 hold on;
 
 % plot3(site.pos.x(1:length(listOfAreas)).*sc, site.pos.z(1:length(listOfAreas)).*sc, site.pos.y(1:length(listOfAreas)).*sc,'r','lineWidth',1);
-plot3([site.pos.x(1) site.pos.x(length(listOfAreas))].*sc, [site.pos.z(1) site.pos.z(length(listOfAreas))].*sc, [site.pos.y(1) site.pos.y(length(listOfAreas))].*sc,'r','lineWidth',1);
-set(gca, 'Color', [1 1 1], 'ZDir', 'Reverse');
+plot3(smoothdata(site.pos.x(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.z(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.y(1:length(listOfAreas)).*sc,100),'g','lineWidth',1);
+set(gca, 'Color', 'None', 'ZDir', 'Reverse');
 view(51, 14); xlim([0 11.4]); ylim([0 13.2]); zlim([0 8]);
 
 
-function site = collectResults(annoPts, warpPos, origPos, info, params, warpDepth)
+function site = collectResults(annoPts, warpPos, origPos, info, params)
 
 site.pos.x = annoPts(:, 1);
 site.pos.y = annoPts(:, 2);
@@ -117,17 +118,15 @@ info.names(inSpace) = names;
 info.inSpace = inSpace;
 
 
-function [siteLoc, warpedProbeLoc, warpedProbeDepth] = warpAndSetSites(warpPts, params, trackPts)
+function [siteLoc, warpedProbeLoc] = warpAndSetSites(warpPts, params, trackPts)
 
 warpedTrack = TPS3D(warpPts(:, 1:3), warpPts(:, 4:6), trackPts); % Allen to MRI
 CtrlDist = (sqrt(sum((warpedTrack-repmat(warpedTrack(1,:), size(warpedTrack, 1), 1)).^2, 2)))*params.ScalingFactor; % dist from the first point
 
 warpedProbeLoc = zeros(params.Nsites, 3);
-warpedProbeDepth = zeros(params.Nsites, 1);
 
 for i = 1:params.Nsites
-    dist = params.TipOffset+(i-1)*params.Pitch; % distance to move from tip
-    warpedProbeDepth(i) = dist;
+    dist = params.TipOffset+(i-1)*params.SiteDist; % distance to move from tip
     
     ix1 = find(dist>=CtrlDist, 1, 'last'); % lower point
     ix2 = find(dist<CtrlDist, 1, 'first'); % upper point
