@@ -1,30 +1,25 @@
 function site = getSiteLocations(fn, params)
+warp.AtoT = readBigWarpLandmarks(fn.AllenToToronto); % Load the MRI warping
+warp.BrainToA = readBigWarpLandmarks(fn.BrainToAllenWithTrack); % Load the brain warping
+Ont = importOntology(fn.Ontology); % Load the CCF ontology
+Anno = loadTifFast(fn.AnnotatedBrain); % Load the CCF annotation
 
-%Load the relevant data
-warp.AtoT = readBigWarpLandmarks(fn.AllenToToronto);
-warp.BrainToA = readBigWarpLandmarks(fn.BrainToAllenWithTrack);
-Ont = importOntology(fn.Ontology);
-Anno = loadTifFast(fn.AnnotatedBrain);
-
-%find the coordinates of the track
-trackix = any(isinf(warp.BrainToA), 2);
+trackix = any(isinf(warp.BrainToA), 2); % The probe track has inf warp in AAT
 trackPts = warp.BrainToA(trackix, 4:6);
 
-%Put down points in warped space
-[sitePos, warpPos] = warpAndSetSites(warp.AtoT, params, trackPts);
+[sitePos, warpPos] = warpAndSetSites(warp.AtoT, params, trackPts); % Electrodes in MRI3D
 
 annoPos = round(sitePos./params.AllenPixelSize./1000);
 info = getSiteAnnotations(annoPos, Anno, Ont);
 
-origPos = warpToBrainSpace(warp.BrainToA, sitePos);
+origPos = warpToBrainSpace(warp.BrainToA, sitePos); % Electrodes in v3D
 
 site = collectResults(annoPos, warpPos, origPos, info, params);
 
 listOfAreas=site.ont.name; emptyAreas=cellfun('isempty',listOfAreas);
 listOfAreas=listOfAreas(~emptyAreas);
-
 info.inBrain = zeros(size(sitePos,1),1);
-info.inBrain(1:length(listOfAreas))=1;
+info.inBrain(1:length(listOfAreas))=1; % # of sites in brain
 
 if params.showVis
     renderIn3D(Anno, site);
@@ -60,7 +55,7 @@ listOfAreas=listOfAreas(~emptyAreas);
 hold on;
 
 % plot3(site.pos.x(1:length(listOfAreas)).*sc, site.pos.z(1:length(listOfAreas)).*sc, site.pos.y(1:length(listOfAreas)).*sc,'r','lineWidth',1);
-plot3(smoothdata(site.pos.x(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.z(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.y(1:length(listOfAreas)).*sc,100),'g','lineWidth',1);
+plot3(smoothdata(site.pos.x(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.z(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.y(1:length(listOfAreas)).*sc,100),'k','lineWidth',1);
 set(gca, 'Color', 'None', 'ZDir', 'Reverse');
 view(51, 14); xlim([0 11.4]); ylim([0 13.2]); zlim([0 8]);
 
@@ -140,11 +135,10 @@ for i = 1:params.Nsites
     end
     warpedProbeLoc(i,:) = warpedTrack(ix1, :) + ((dist-CtrlDist(ix1))./(CtrlDist(ix2)-CtrlDist(ix1))*(warpedTrack(ix2,:) - warpedTrack(ix1, :)));
 end
-siteLoc = TPS3D(warpPts(:, 4:6), warpPts(:, 1:3), warpedProbeLoc);
+siteLoc = TPS3D(warpPts(:, 4:6), warpPts(:, 1:3), warpedProbeLoc); % MRI to AAT
 
 
 function pts = readBigWarpLandmarks(AllenToToronto)
-
 col = 3:8;
 
 fid = fopen(AllenToToronto);
