@@ -7,6 +7,23 @@ Anno = loadTifFast(fn.AnnotatedBrain); % Load the CCF annotation
 trackix = any(isinf(warp.BrainToA), 2); % The probe track has inf warp in AAT
 trackPts = warp.BrainToA(trackix, 4:6);
 
+params1=params;
+params1.ephysAnchors = [1 2];
+params1.mriAnchors = [1 2];
+[sitePos,warpPos,sfSite]=warpAndSetSites(warp.AtoT,params1,trackPts); % Electrodes in MRI3D
+
+annoPos = round(sitePos./params.AllenPixelSize./1000);
+info = getSiteAnnotations(annoPos, Anno, Ont);
+
+origPos = warpToBrainSpace(warp.BrainToA, sitePos); % Electrodes in v3D
+
+site = collectResults(annoPos, warpPos,origPos,info,params,sfSite);
+
+listOfAreas=site.ont.id(~isnan(site.ont.id) & site.ont.id~=0);
+info.inBrain = zeros(size(sitePos,1),1);
+info.inBrain(1:length(listOfAreas))=1; % # of sites in brain
+
+params.TipOffset=length(listOfAreas)/100;
 [sitePos,warpPos,sfSite]=warpAndSetSites(warp.AtoT,params,trackPts); % Electrodes in MRI3D
 
 annoPos = round(sitePos./params.AllenPixelSize./1000);
@@ -131,8 +148,11 @@ for i=1:length(site2scale)-1
 end
 
 for i = 1:params.Nsites
-%     dist = params.TipOffset+(i-1)*params.SiteDist; % distance to move from tip
-    dist = params.TipOffset+(i-1)*params.SiteDist/sfSite(i); % distance to move from tip
+    if isfield(params,'TipOffset')
+        dist = (params.TipOffset-tip/100)+(i-1)*params.SiteDist/sfSite(i); % distance to move from tip
+    else
+        dist = (i-1)*params.SiteDist; % distance to move from tip
+    end
     
     ix1 = find(dist>=CtrlDist, 1, 'last'); % lower point
     ix2 = find(dist<CtrlDist, 1, 'first'); % upper point

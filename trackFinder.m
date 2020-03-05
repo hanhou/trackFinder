@@ -8,7 +8,6 @@ fn.AnnotatedBrain = 'C:\Users\liul.HHMI\Desktop\trackFinderData\Annotation_new_1
 fn.Ontology = 'mousebrainontology_2.csv'; % 2017 v3
 
 %all in mm
-params.TipOffset = 0.43;
 params.SiteDist = 0.01; % site dist
 params.ephysAnchors = ephysAnchors;
 params.mriAnchors = mriAnchors;
