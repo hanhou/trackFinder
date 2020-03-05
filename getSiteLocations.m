@@ -7,14 +7,14 @@ Anno = loadTifFast(fn.AnnotatedBrain); % Load the CCF annotation
 trackix = any(isinf(warp.BrainToA), 2); % The probe track has inf warp in AAT
 trackPts = warp.BrainToA(trackix, 4:6);
 
-[sitePos, warpPos] = warpAndSetSites(warp.AtoT, params, trackPts); % Electrodes in MRI3D
+[sitePos,warpPos,sfSite]=warpAndSetSites(warp.AtoT,params,trackPts); % Electrodes in MRI3D
 
 annoPos = round(sitePos./params.AllenPixelSize./1000);
 info = getSiteAnnotations(annoPos, Anno, Ont);
 
 origPos = warpToBrainSpace(warp.BrainToA, sitePos); % Electrodes in v3D
 
-site = collectResults(annoPos, warpPos, origPos, info, params);
+site = collectResults(annoPos, warpPos,origPos,info,params,sfSite);
 
 listOfAreas=site.ont.name; emptyAreas=cellfun('isempty',listOfAreas);
 listOfAreas=listOfAreas(~emptyAreas);
@@ -25,12 +25,10 @@ if params.showVis
     renderIn3D(Anno, site);
 end
 
-
 function orig = warpToBrainSpace(warpPts, pos)
 trackix = any(isinf(warpPts), 2);
 warpPts = warpPts(~trackix, :);
 orig = TPS3D(warpPts(:, 4:6), warpPts(:, 1:3), pos);
-
 
 function renderIn3D(Anno, site)
 sc = site.pos.mmPerPixel;
@@ -49,18 +47,17 @@ listOfAreas=site.ont.name;
 emptyAreas=cellfun('isempty',listOfAreas);
 listOfAreas=listOfAreas(~emptyAreas);
 
-% p = patch(isosurface(xv.*sc, yv.*sc, zv.*sc, an ,1));
-% p.FaceAlpha = 0.05; p.FaceColor = [0 0 0]; p.LineStyle = 'none';
+p = patch(isosurface(xv.*sc, yv.*sc, zv.*sc, an ,1));
+p.FaceAlpha = 0.05; p.FaceColor = [0 0 0]; p.LineStyle = 'none';
 
 hold on;
 
-% plot3(site.pos.x(1:length(listOfAreas)).*sc, site.pos.z(1:length(listOfAreas)).*sc, site.pos.y(1:length(listOfAreas)).*sc,'r','lineWidth',1);
-plot3(smoothdata(site.pos.x(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.z(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.y(1:length(listOfAreas)).*sc,100),'k','lineWidth',1);
+plot3(site.pos.x(1:length(listOfAreas)).*sc,site.pos.z(1:length(listOfAreas)).*sc,site.pos.y(1:length(listOfAreas)).*sc,'r','lineWidth',1);
+% plot3(smoothdata(site.pos.x(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.z(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.y(1:length(listOfAreas)).*sc,100),'k','lineWidth',1);
 set(gca, 'Color', 'None', 'ZDir', 'Reverse');
 view(51, 14); xlim([0 11.4]); ylim([0 13.2]); zlim([0 8]);
 
-
-function site = collectResults(annoPts, warpPos, origPos, info, params)
+function site = collectResults(annoPts, warpPos, origPos, info, params, sfSite)
 
 site.pos.x = annoPts(:, 1);
 site.pos.y = annoPts(:, 2);
@@ -89,6 +86,7 @@ site.in.brain=logical(site.in.brain);
 
 site.params = params;
 
+site.sfSite = sfSite;
 
 function info = getSiteAnnotations(pts, Anno, Ont)
 
@@ -112,16 +110,29 @@ info.ids(inSpace) = ids;
 info.names(inSpace) = names;
 info.inSpace = inSpace;
 
+function [siteLoc,warpedProbeLoc,sfSite]=warpAndSetSites(warpPts,params,trackPts)
 
-function [siteLoc, warpedProbeLoc] = warpAndSetSites(warpPts, params, trackPts)
-
-warpedTrack = TPS3D(warpPts(:, 1:3), warpPts(:, 4:6), trackPts); % Allen to MRI
-CtrlDist = (sqrt(sum((warpedTrack-repmat(warpedTrack(1,:), size(warpedTrack, 1), 1)).^2, 2)))*params.ScalingFactor; % dist from the first point
+warpedTrack=TPS3D(warpPts(:, 1:3), warpPts(:, 4:6), trackPts); % Allen to MRI
+CtrlDist=(sqrt(sum((warpedTrack-repmat(warpedTrack(1,:),size(warpedTrack,1),1)).^2,2))); % dist from the first point
 
 warpedProbeLoc = zeros(params.Nsites, 3);
 
+distance1=diff(params.mriAnchors); % distance in MRI
+distanceReal=diff(params.ephysAnchors); % ephys distance
+scaleLine=distanceReal./distance1;
+scaleLine=[scaleLine(1) scaleLine scaleLine(end)] % extrapolate first and last
+tip=(params.mriAnchors(end)+(384-params.ephysAnchors(end))/scaleLine(end)) % extrapolate the tip in MRI
+
+site2scale=fliplr(diff([round(tip)-999 params.mriAnchors round(tip)]));
+site2scale=[0 cumsum(site2scale)]+1;
+sfSite=ones(params.Nsites,1);
+for i=1:length(site2scale)-1
+    sfSite(site2scale(i):site2scale(i+1))=scaleLine(i);
+end
+
 for i = 1:params.Nsites
-    dist = params.TipOffset+(i-1)*params.SiteDist; % distance to move from tip
+%     dist = params.TipOffset+(i-1)*params.SiteDist; % distance to move from tip
+    dist = params.TipOffset+(i-1)*params.SiteDist/sfSite(i); % distance to move from tip
     
     ix1 = find(dist>=CtrlDist, 1, 'last'); % lower point
     ix2 = find(dist<CtrlDist, 1, 'first'); % upper point
@@ -133,10 +144,9 @@ for i = 1:params.Nsites
         ix2 = ix1;
         ix1 = ix1-1;
     end
-    warpedProbeLoc(i,:) = warpedTrack(ix1, :) + ((dist-CtrlDist(ix1))./(CtrlDist(ix2)-CtrlDist(ix1))*(warpedTrack(ix2,:) - warpedTrack(ix1, :)));
+    warpedProbeLoc(i,:)=warpedTrack(ix1,:)+((dist-CtrlDist(ix1))./(CtrlDist(ix2)-CtrlDist(ix1))*(warpedTrack(ix2,:)-warpedTrack(ix1,:)));
 end
-siteLoc = TPS3D(warpPts(:, 4:6), warpPts(:, 1:3), warpedProbeLoc); % MRI to AAT
-
+siteLoc=TPS3D(warpPts(:,4:6),warpPts(:,1:3),warpedProbeLoc); % MRI to AAT
 
 function pts = readBigWarpLandmarks(AllenToToronto)
 col = 3:8;
@@ -224,7 +234,7 @@ gx=object(:,1);
 gy=object(:,2);
 gz=object(:,3);
 for nn = 1:npnts
-    K(:,nn) = (gx - points(nn,1)).^2 + (gy - points(nn,2) ).^2 + (gz - points(nn,3) ).^2; % R^2
+    K(:,nn)=(gx-points(nn,1)).^2+(gy-points(nn,2)).^2+(gz-points(nn,3)).^2; % R^2
 end
 K = max(K,1e-320); 
 K = sqrt(K); %|R| for 3D

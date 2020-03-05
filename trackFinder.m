@@ -1,5 +1,5 @@
-function site=trackFinder(filename)
-%Full path to BigWarp output file
+function site=trackFinder(filename,mriAnchors,ephysAnchors,saveOrNo)
+% Full path to BigWarp output file
 fn.BrainToAllenWithTrack = filename;
 
 % These files need to be in the same directory as the code
@@ -8,9 +8,10 @@ fn.AnnotatedBrain = 'C:\Users\liul.HHMI\Desktop\trackFinderData\Annotation_new_1
 fn.Ontology = 'mousebrainontology_2.csv'; % 2017 v3
 
 %all in mm
-params.TipOffset = 0.4;
+params.TipOffset = 0.43;
 params.SiteDist = 0.01; % site dist
-params.ScalingFactor = 1;
+params.ephysAnchors = ephysAnchors;
+params.mriAnchors = mriAnchors;
 params.AllenPixelSize = 0.02;
 params.Nsites = 1000;
 params.showVis = 1;
@@ -18,5 +19,7 @@ params.showVis = 1;
 site = getSiteLocations(fn, params); % MRI
 % site = getSiteLocationsNoMRI(fn, params); % No MRI
 plotAnnotation(site);
-% save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site'); % Save site information to a .mat file
-% save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo_noMRI.mat'], 'site'); % Save site information to a .mat file
+if saveOrNo==1
+    save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo.mat'], 'site'); % Save site information to a .mat file
+%     save([fn.BrainToAllenWithTrack(1:end-4) '_siteInfo_noMRI.mat'], 'site'); % Save site information to a .mat file
+end
