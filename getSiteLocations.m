@@ -23,7 +23,9 @@ listOfAreas=site.ont.id(~isnan(site.ont.id) & site.ont.id~=0);
 info.inBrain = zeros(size(sitePos,1),1);
 info.inBrain(1:length(listOfAreas))=1; % # of sites in brain
 
-params.TipOffset=length(listOfAreas)/100;
+if sum(params.ephysAnchors-params.mriAnchors)~=0
+    params.TipOffset=length(listOfAreas)/100;
+end
 [sitePos,warpPos,sfSite]=warpAndSetSites(warp.AtoT,params,trackPts); % Electrodes in MRI3D
 
 annoPos = round(sitePos./params.AllenPixelSize./1000);
