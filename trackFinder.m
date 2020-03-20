@@ -12,7 +12,7 @@ params.SiteDist = 0.01; % site dist
 params.ephysAnchors = ephysAnchors;
 params.mriAnchors = mriAnchors;
 params.AllenPixelSize = 0.02;
-params.Nsites = 1000;
+params.Nsites = 1280;
 params.showVis = 1;
 
 site = getSiteLocations(fn, params); % MRI

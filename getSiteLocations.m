@@ -24,7 +24,8 @@ info.inBrain = zeros(size(sitePos,1),1);
 info.inBrain(1:length(listOfAreas))=1; % # of sites in brain
 
 if sum(params.ephysAnchors-params.mriAnchors)~=0
-    params.TipOffset=length(listOfAreas)/100;
+%     params.TipOffset=length(listOfAreas)/100;
+    params.TipOffset=length(listOfAreas)*params.SiteDist;
 end
 [sitePos,warpPos,sfSite]=warpAndSetSites(warp.AtoT,params,trackPts); % Electrodes in MRI3D
 
@@ -141,8 +142,9 @@ distanceReal=diff(params.ephysAnchors); % ephys distance
 scaleLine=distanceReal./distance1;
 scaleLine=[scaleLine(1) scaleLine scaleLine(end)] % extrapolate first and last
 tip=(params.mriAnchors(end)+(384-params.ephysAnchors(end))/scaleLine(end)) % extrapolate the tip in MRI
+% tip=(params.mriAnchors(end)+(96-params.ephysAnchors(end))/scaleLine(end)) % extrapolate the tip in MRI
 
-site2scale=fliplr(diff([round(tip)-999 params.mriAnchors round(tip)]));
+site2scale=fliplr(diff([round(tip)-params.Nsites+1 params.mriAnchors round(tip)]));
 site2scale=[0 cumsum(site2scale)]+1;
 sfSite=ones(params.Nsites,1);
 for i=1:length(site2scale)-1
@@ -151,7 +153,7 @@ end
 
 for i = 1:params.Nsites
     if isfield(params,'TipOffset')
-        dist = (params.TipOffset-tip/100)+(i-1)*params.SiteDist/sfSite(i); % distance to move from tip
+        dist = (params.TipOffset-tip*params.SiteDist)+(i-1)*params.SiteDist/sfSite(i); % distance to move from tip
     else
         dist = (i-1)*params.SiteDist; % distance to move from tip
     end
