@@ -7,7 +7,7 @@ Anno = loadTifFast(fn.AnnotatedBrain); % Load the CCF annotation
 trackix = any(isinf(warp.BrainToA), 2); % The probe track has inf warp in AAT
 trackPts = warp.BrainToA(trackix, 4:6);
 
-params1=params;
+params1=params; % first get the mapping 1:1, and then scale based on the inputs
 params1.ephysAnchors = [1 2];
 params1.mriAnchors = [1 2];
 [sitePos,warpPos,sfSite]=warpAndSetSites(warp.AtoT,params1,trackPts); % Electrodes in MRI3D
@@ -23,9 +23,9 @@ listOfAreas=site.ont.id(~isnan(site.ont.id) & site.ont.id~=0);
 info.inBrain = zeros(size(sitePos,1),1);
 info.inBrain(1:length(listOfAreas))=1; % # of sites in brain
 
-if sum(params.ephysAnchors-params.mriAnchors)~=0
+if sum(params.ephysAnchors-params.mriAnchors)~=0 % only scale and shift if the inputs are different
 %     params.TipOffset=length(listOfAreas)/100;
-    params.TipOffset=length(listOfAreas)*params.SiteDist;
+    params.TipOffset=length(listOfAreas)*params.SiteDist; % calculate the tip offset based on number of sites supposed to be in the brain
 end
 [sitePos,warpPos,sfSite]=warpAndSetSites(warp.AtoT,params,trackPts); % Electrodes in MRI3D
 
