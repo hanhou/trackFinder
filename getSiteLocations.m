@@ -2,10 +2,14 @@ function site = getSiteLocations(fn, params)
 warp.AtoT = readBigWarpLandmarks(fn.AllenToToronto); % Load the MRI warping
 warp.BrainToA = readBigWarpLandmarks(fn.BrainToAllenWithTrack); % Load the brain warping
 Ont = importOntology(fn.Ontology); % Load the CCF ontology
-Anno = loadTifFast(fn.AnnotatedBrain); % Load the CCF annotation
+% Anno = loadTifFast(fn.AnnotatedBrain); % Load the CCF annotation
+Anno = nrrdread(fn.AnnotatedBrain); % Load the CCF annotation
+Anno = permute(Anno,[1 3 2]); % Load the CCF annotation
 
 trackix = any(isinf(warp.BrainToA), 2); % The probe track has inf warp in AAT
 trackPts = warp.BrainToA(trackix, 4:6);
+[~, sort_bottom_to_top] = sort(trackPts(:,2), 'descend');
+trackPts = trackPts(sort_bottom_to_top, :);
 
 params1=params; % first get the mapping 1:1, and then scale based on the inputs
 params1.ephysAnchors = [1 2];
@@ -60,17 +64,19 @@ xv = 1:ds:size(Anno, 2);
 yv = 1:ds:size(Anno, 3);
 zv = 1:ds:size(Anno, 1);
 
-% figure; 
-subplot(111); axis image;
+figure(1); 
+if isempty(findobj(figure(1),'type','axes'))
+    subplot(111); axis image;
+
+    p = patch(isosurface(xv.*sc, yv.*sc, zv.*sc, an ,1));
+    p.FaceAlpha = 0.05; p.FaceColor = [0 0 0]; p.LineStyle = 'none';
+
+    hold on;
+end
 
 listOfAreas=site.ont.name;
 emptyAreas=cellfun('isempty',listOfAreas);
 listOfAreas=listOfAreas(~emptyAreas);
-
-p = patch(isosurface(xv.*sc, yv.*sc, zv.*sc, an ,1));
-p.FaceAlpha = 0.05; p.FaceColor = [0 0 0]; p.LineStyle = 'none';
-
-hold on;
 
 plot3(site.pos.x(1:length(listOfAreas)).*sc,site.pos.z(1:length(listOfAreas)).*sc,site.pos.y(1:length(listOfAreas)).*sc,'r','lineWidth',1);
 % plot3(smoothdata(site.pos.x(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.z(1:length(listOfAreas)).*sc,'movmedian',100), smoothdata(site.pos.y(1:length(listOfAreas)).*sc,100),'k','lineWidth',1);
@@ -140,20 +146,22 @@ warpedProbeLoc = zeros(params.Nsites, 3);
 distance1=diff(params.mriAnchors); % distance in MRI
 distanceReal=diff(params.ephysAnchors); % ephys distance
 scaleLine=distanceReal./distance1;
-scaleLine=[scaleLine(1) scaleLine scaleLine(end)] % extrapolate first and last
-tip=(params.mriAnchors(end)+(384-params.ephysAnchors(end))/scaleLine(end)) % extrapolate the tip in MRI
+scaleLine=[scaleLine(1) scaleLine scaleLine(end)]; % extrapolate first and last
+tip=(params.mriAnchors(end)+(384-params.ephysAnchors(end))/scaleLine(end)); % extrapolate the tip in MRI
 % tip=(params.mriAnchors(end)+(96-params.ephysAnchors(end))/scaleLine(end)) % extrapolate the tip in MRI
 
 site2scale=fliplr(diff([round(tip)-params.Nsites+1 params.mriAnchors round(tip)]));
 site2scale=[0 cumsum(site2scale)]+1;
 sfSite=ones(params.Nsites,1);
+scaleLine=fliplr(scaleLine);
 for i=1:length(site2scale)-1
     sfSite(site2scale(i):site2scale(i+1))=scaleLine(i);
 end
-
+% sfSite=flip(sfSite);
 for i = 1:params.Nsites
     if isfield(params,'TipOffset')
         dist = (params.TipOffset-tip*params.SiteDist)+(i-1)*params.SiteDist/sfSite(i); % distance to move from tip
+%         dist = (params.TipOffset-tip*params.SiteDist)+sum(params.SiteDist/sfSite(1:i-1)); % distance to move from tip
     else
         dist = (i-1)*params.SiteDist; % distance to move from tip
     end
