@@ -2,7 +2,9 @@ function site = getSiteLocations(fn, params)
 warp.AtoT = readBigWarpLandmarks(fn.AllenToToronto); % Load the MRI warping
 warp.BrainToA = readBigWarpLandmarks(fn.BrainToAllenWithTrack); % Load the brain warping
 Ont = importOntology(fn.Ontology); % Load the CCF ontology
-Anno = loadTifFast(fn.AnnotatedBrain); % Load the CCF annotation
+% Anno = loadTifFast(fn.AnnotatedBrain); % Load the CCF annotation
+Anno = nrrdread(fn.AnnotatedBrain); % Load the CCF annotation
+Anno = permute(Anno,[1 3 2]); % Load the CCF annotation
 
 trackix = any(isinf(warp.BrainToA), 2); % The probe track has inf warp in AAT
 trackPts = warp.BrainToA(trackix, 4:6);
@@ -147,13 +149,15 @@ tip=(params.mriAnchors(end)+(384-params.ephysAnchors(end))/scaleLine(end)) % ext
 site2scale=fliplr(diff([round(tip)-params.Nsites+1 params.mriAnchors round(tip)]));
 site2scale=[0 cumsum(site2scale)]+1;
 sfSite=ones(params.Nsites,1);
+scaleLine=fliplr(scaleLine);
 for i=1:length(site2scale)-1
     sfSite(site2scale(i):site2scale(i+1))=scaleLine(i);
 end
-
+% sfSite=flip(sfSite);
 for i = 1:params.Nsites
     if isfield(params,'TipOffset')
         dist = (params.TipOffset-tip*params.SiteDist)+(i-1)*params.SiteDist/sfSite(i); % distance to move from tip
+%         dist = (params.TipOffset-tip*params.SiteDist)+sum(params.SiteDist/sfSite(1:i-1)); % distance to move from tip
     else
         dist = (i-1)*params.SiteDist; % distance to move from tip
     end
