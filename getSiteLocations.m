@@ -3,7 +3,12 @@ warp.AtoT = readBigWarpLandmarks(fn.AllenToToronto); % Load the MRI warping
 warp.BrainToA = readBigWarpLandmarks(fn.BrainToAllenWithTrack); % Load the brain warping
 Ont = importOntology(fn.Ontology); % Load the CCF ontology
 % Anno = loadTifFast(fn.AnnotatedBrain); % Load the CCF annotation
-Anno = nrrdread(fn.AnnotatedBrain); % Load the CCF annotation
+% Anno = nrrdread(fn.AnnotatedBrain); % Load the CCF annotation
+
+% Load mat file to avoid generating lots of .tmp files in
+% Appdata\Local\Temp by nrrdread...
+CCF = load('annotation_25.mat');
+Anno = CCF.Anno;
 Anno = permute(Anno,[1 3 2]); % Load the CCF annotation
 
 trackix = any(isinf(warp.BrainToA), 2); % The probe track has inf warp in AAT
