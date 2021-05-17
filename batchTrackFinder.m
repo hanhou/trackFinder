@@ -30,7 +30,8 @@ for f = 1:length(allMatFile)
     movefile(fullfile(this.folder, this.name), fullfile(this.folder,newName));
     
     % Do trackFinder
-    trackFinder(fullfile(this.folder, newName), [1 2], [1 2], true, npxVersion, false);
+    % trackFinder(filename, mriAnchors, ephysAnchors, saveOrNo, npxVersion, reflectOrNo, plotOrNo)
+    trackFinder(fullfile(this.folder, newName), [1 2], [1 2], true, npxVersion, true, false);
     fprintf('Done: %s, npx: %d\n', newName, npxVersion);
     
  end

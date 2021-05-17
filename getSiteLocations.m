@@ -8,7 +8,9 @@ Anno = permute(Anno,[1 3 2]); % Load the CCF annotation
 
 trackix = any(isinf(warp.BrainToA), 2); % The probe track has inf warp in AAT
 trackPts = warp.BrainToA(trackix, 4:6);
-[~, sort_bottom_to_top] = sort(trackPts(:,2), 'descend');
+
+% Sort
+[~, sort_bottom_to_top] = sort(trackPts(:,2), 'descend'); 
 trackPts = trackPts(sort_bottom_to_top, :);
 
 params1=params; % first get the mapping 1:1, and then scale based on the inputs
