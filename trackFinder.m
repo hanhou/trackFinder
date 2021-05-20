@@ -18,15 +18,16 @@ fn.Ontology = 'mousebrainontology_2.csv'; % 2017 v3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if npxVersion == 1
     params.SiteDist = 0.01; % site dist NP1 (mm; assumed spacing between sites in MRI space)
+    params.Nsites = 960; % (number of sites on the probe)
 else
     params.SiteDist = 0.0075; % site dist NP2
+    params.Nsites = 1280; % (number of sites on the probe)
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 params.mriAnchors = mriAnchors; % the landmarks we look for (in electrode number along the probe, larger number is more ventral)
 params.ephysAnchors = ephysAnchors; % the landmarks we look for on the probe (in electrode number, 384 is hardcode to the the tip of the probe) 
 params.AllenPixelSize = 0.025; % (mm)
-params.Nsites = 1000; % (number of sites on the probe)
 params.showVis = 1; % show the visualization in CCF
 
 % Reflect L and R if needed

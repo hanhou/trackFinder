@@ -19,7 +19,7 @@ for i=1:length(areaB)-1
         color = sscanf(color,'%2x%2x%2x',[1 3])/255;
     end
     plot([1 1],[areaB(i) areaB(i+1)]*site.params.SiteDist,'Color',color,'LineWidth',40)% plot color line
-    text(3,(areaB(i)+areaB(i+1))/2*site.params.SiteDist,areaN(areaB(i+1)),'FontSize',5)% annotation beside the line
+    text(3,(areaB(i)+areaB(i+1))/2*site.params.SiteDist,areaN(areaB(i+1)),'FontSize',10)% annotation beside the line
 end
 box off
 ylabel('Depth in the brain (mm)')

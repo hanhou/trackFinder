@@ -1,4 +1,5 @@
-rootPath = 'E:\Data_for_ingestion\MAP\SC045\histology';
+ifFlipLR = true;
+rootPath = 'E:\Data_for_ingestion\MAP\SC053\histology';
 pattern = {'imec'};
 allMatFile = dir(fullfile(rootPath, '*.csv'));
 
@@ -13,12 +14,13 @@ for f = 1:length(allMatFile)
     name = regexp(this.name,'(?<wr>\w*)_(?<m>\d\d)(?<d>\d\d)(?<y>\d\d)_imec(?<imec>\d+)', 'names');
     newName = sprintf('landmarks_%s_20%s%s%s_%d', name.wr, name.y, name.m, name.d, str2double(name.imec) + 1);
     
+    % Parse npxVersion
     shank = regexp(this.name,'shank(?<shank>\d)', 'names');
     if ~isempty(shank)
         newName = [newName '_' num2str(str2double(shank.shank)+1)];
         npxVersion = 2; % More than one shank, must be 2.0 probe
     else
-        npx = regexp(this.name,'npx(?<npx>\d)');
+        npx = regexp(this.name,'npx(?<npx>\d*)');
         if isempty(npx)
             npxVersion = 1; % By default, 1.0 probe
         else
@@ -31,7 +33,7 @@ for f = 1:length(allMatFile)
     
     % Do trackFinder
     % trackFinder(filename, mriAnchors, ephysAnchors, saveOrNo, npxVersion, reflectOrNo, plotOrNo)
-    trackFinder(fullfile(this.folder, newName), [1 2], [1 2], true, npxVersion, true, false);
+    trackFinder(fullfile(this.folder, newName), [1 2], [1 2], true, npxVersion, ifFlipLR, false);
     fprintf('Done: %s, npx: %d\n', newName, npxVersion);
     
  end
