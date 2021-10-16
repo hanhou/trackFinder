@@ -1,6 +1,6 @@
 ifFlipLR = true;
-rootPath = 'E:\Data_for_ingestion\MAP\SC053\histology';
-pattern = {'imec'};
+rootPath = 'F:\Data_for_ingestion\MAP\HH08\histology';
+pattern = {'landmarks'};
 allMatFile = dir(fullfile(rootPath, '*.csv'));
 
 %%
@@ -10,26 +10,30 @@ for f = 1:length(allMatFile)
         continue
     end
     
-    % Rename
-    name = regexp(this.name,'(?<wr>\w*)_(?<m>\d\d)(?<d>\d\d)(?<y>\d\d)_imec(?<imec>\d+)', 'names');
-    newName = sprintf('landmarks_%s_20%s%s%s_%d', name.wr, name.y, name.m, name.d, str2double(name.imec) + 1);
+%     name = regexp(this.name,'(?<wr>\w*)_(?<m>\d\d)(?<d>\d\d)(?<y>\d\d)_imec(?<imec>\d+)', 'names');
+    % Input name format from BigWarper (all index starts from 1)
+    % NP1.0: "landmarks_HH08_20210815_1.csv"
+    % NP2.1: "landmarks_HH08_20210814_3_npx21.csv" (to differentiate from NP1.0)
+    % NP2.4: "landmarks_HH08_20210824_1_1.csv"
+    name = regexp(this.name,'(?<wr>\w*)_(?<y>\d\d\d\d)(?<m>\d\d)(?<d>\d\d)_(?<insertion>\d+)_?(?<shank>(\d|npx.*))?.csv', 'names');
+    
+    newName = sprintf('%s_%s%s%s_%d', name.wr, name.y, name.m, name.d, str2double(name.insertion));
     
     % Parse npxVersion
-    shank = regexp(this.name,'shank(?<shank>\d)', 'names');
-    if ~isempty(shank)
-        newName = [newName '_' num2str(str2double(shank.shank)+1)];
-        npxVersion = 2; % More than one shank, must be 2.0 probe
+    if isempty(name.shank)  % NP1.0
+        npxVersion = 1;
     else
-        npx = regexp(this.name,'npx(?<npx>\d*)');
-        if isempty(npx)
-            npxVersion = 1; % By default, 1.0 probe
-        else
-            npxVersion = 2;
+        npxVersion = 2;  
+        if ~contains(name.shank, 'npx')  % NP2.4        
+            newName = [newName '_' name.shank]; % Add shank number to name
         end
     end
     
     newName = [newName '.csv'];    
-    movefile(fullfile(this.folder, this.name), fullfile(this.folder,newName));
+    
+    if ~strcmp(this.name, newName)
+        movefile(fullfile(this.folder, this.name), fullfile(this.folder, newName));
+    end
     
     % Do trackFinder
     % trackFinder(filename, mriAnchors, ephysAnchors, saveOrNo, npxVersion, reflectOrNo, plotOrNo)
